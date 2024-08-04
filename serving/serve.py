@@ -29,11 +29,10 @@ def generate_keys():
 
     predictions["subject_mof_key"] = predictions['s'].apply(get_mof_key)
     predictions["name"] = predictions['o'].apply(get_name)
+    predictions["valid"] = None
 
-    #predictions["subject_mof_key"] = predictions['s'].map(lambda x: x['mofkey'] if 'mofkey' in x else None)
-    #predictions["subject_mof_key"] = predictions['s'].map(lambda x: identifiers.get(x, {}).get('mofkey'))
-   
-    #print(predictions.head)
-    print(identifiers[str(316761)])
     
-generate_keys()
+    # for index, row in predictions.iterrows():
+    #     print(identifiers[str(row['o'])])
+
+    predictions.to_csv("predictions/top_small.csv", index=False)
