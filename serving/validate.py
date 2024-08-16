@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import pandas as pd
 import gradio as gr
-from serve import generate_keys
+import json
 
 app = FastAPI()
 
@@ -9,14 +9,32 @@ class Validation:
 
     def __init__(self, prediction_file):
 
-        print("Initializing validation")
+        # print("Initializing validation")
         self.filepath = f'predictions/{prediction_file}'
+
+        # with open(self.filepath, 'r') as file:
+        #     # Read and print the first two lines
+        #     for i in range(2):
+        #         line = file.readline()
+        #         if line:
+        #             print(line.strip())
+        #         else:
+        #             break
+
         self.pred_df = pd.read_csv(self.filepath)
-        self.row_iterator = iter(self.pred_df.iterrows())
+        self.row_iterator = iter(self.pred_df. iterrows())
 
     def get_new_row(self):
-        # Get the next row from the iterator
-        self.index, self.row = next(self.row_iterator)
+
+        try:
+            while True:
+                self.index, self.row = next(self.row_iterator)
+                # print(json.dumps(self.row.to_dict(), indent=3))
+                if (self.row['valid'] == 'none'):
+                    break
+        except StopIteration:
+            return "Ran out of rows in dataframe"
+
         # Convert the row to a dictionary
         row_dict = self.row.to_dict()
         return f"{row_dict['subject_mof_key']} predicate: {row_dict['p']} name: {row_dict['name']}"
@@ -28,10 +46,9 @@ class Validation:
         self.pred_df.at[self.index, 'valid'] = 'no'
 
     def save(self):
-        self.pred_df.to_csv("predictions/testing.csv", index=False)
+        self.pred_df.to_csv(self.filepath, index=False)
 
     def execute(self):
-        generate_keys()
 
         with gr.Blocks() as validate:
             gr.Markdown("Click **Generate New** and validate the mof.")
@@ -53,8 +70,5 @@ class Validation:
         global app
         app = gr.mount_gradio_app(app, validate, path="/gradio")
 
-v = Validation("top_small.csv")
+v = Validation("top_processed.csv")
 v.execute()
-
-
-

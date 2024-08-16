@@ -4,7 +4,7 @@ import gradio as gr
 from serve import generate_keys
 
 app = FastAPI()
-filepath = f'predictions/topology_small.csv'
+filepath = f'predictions/top_small.csv'
 pred_df = pd.read_csv(filepath)
 row_iterator = iter(pred_df.iterrows())
 

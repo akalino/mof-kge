@@ -17,7 +17,7 @@ def generate_keys():
     #         break
 
     # Read the CSV file into a DataFrame
-    prediction_file = "predictions/topology_small.csv"
+    prediction_file = "predictions/new_fact_scores_topology.csv"
     predictions = pd.read_csv(prediction_file)
 
     def get_mof_key(id):
@@ -29,10 +29,14 @@ def generate_keys():
 
     predictions["subject_mof_key"] = predictions['s'].apply(get_mof_key)
     predictions["name"] = predictions['o'].apply(get_name)
-    predictions["valid"] = None
+    predictions["valid"] = 'none'
+    predictions = predictions.dropna(subset=['name'])
+
 
     
     # for index, row in predictions.iterrows():
     #     print(identifiers[str(row['o'])])
 
-    predictions.to_csv("predictions/top_small.csv", index=False)
+    predictions.to_csv("predictions/top_processed.csv", index=False)
+
+generate_keys()
